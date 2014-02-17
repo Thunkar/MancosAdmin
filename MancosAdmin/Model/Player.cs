@@ -15,5 +15,23 @@ namespace MancosAdmin.Model
             this.Name = name;
         }
 
+
+        public override bool Equals(object anotherPlayer)
+        {
+            if (anotherPlayer is Player) return this.Name.Equals(((Player)anotherPlayer).Name);
+            else return base.Equals(anotherPlayer);
+        }
+
+        public override int GetHashCode()
+        {
+            byte[] stringBytes = System.Text.Encoding.ASCII.GetBytes(this.Name);
+            int sum = 0;
+            for (int i = 0; i < stringBytes.Length; i++)
+            {
+                sum += stringBytes[i];
+            }
+            return this.Name.Length ^ sum;
+        }
+
     }
 }

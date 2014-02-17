@@ -65,13 +65,15 @@ namespace MancosAdmin.Model
                 NotifyPropertyChanged("Running");
             }
         }
-        public ObservableCollection<Player> Players;
+        public ObservableSet<Player> Players;
+        public ObservableCollection<ConsoleInput> consoleData;
         public DispatcherTimer ramtimer;
 
 
         public ServerWrapper()
         {
-            Players = new ObservableCollection<Player>();
+            Players = new ObservableSet<Player>();
+            consoleData = new ObservableCollection<ConsoleInput>();
             TimeSpan ramspan = new TimeSpan(0, 0, 0, 1);
             ramtimer = new DispatcherTimer();
             ramtimer.Interval = ramspan;
@@ -133,7 +135,8 @@ namespace MancosAdmin.Model
                 name = name.Substring(nameStart);
                 name = name.Replace("User ", "");
                 name = name.Trim();
-                Players.Add(new Player(name));
+                Player tobeadded = new Player(name);
+                Players.Add(tobeadded);
             }
             if (input != null && input.Contains("lost connection"))
             {

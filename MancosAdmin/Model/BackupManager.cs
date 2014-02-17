@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MancosAdmin.Model
 {
-    class BackupManager
+    class BackupManager 
     {
         public List<string> BackupList;
         public string BackupPath = MainWindow.ServerPath + "\\ServerBackups";

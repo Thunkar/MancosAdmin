@@ -45,37 +45,37 @@
                 <TextBox x:Name="MinRAMBox" Grid.Column="1" FontSize="24" Text="{Binding ServerWrapper.MinRAM, Mode=OneWayToSource}"/>
                 <TextBox x:Name="MaxRAMBox" Grid.Column="1" Grid.Row="1" FontSize="24" Text="{Binding ServerWrapper.MaxRAM, Mode=OneWayToSource}"/>
             </Grid>
-            <ListView x:Name="PlayerNames" Width="Auto" Margin="0,20,0,0" Background="Black">
-                <ListView.View>
-                    <GridView x:Name="PlayerNamesColumn">
-                        <GridViewColumn Width="300">
-                            <GridViewColumnHeader BorderBrush="Transparent" Background="Black" HorizontalContentAlignment="Stretch" Content="Connected Players" Foreground="White" FontSize="24"/>
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock FontSize="18" Background="Black" Foreground="White" Text="{Binding Name}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
+            <TextBlock x:Name="CurrentPlayers" Text="Connected Players" Foreground="White" FontSize="24" Margin="0,20,0,0"/>
+            <ListView x:Name="PlayerNames" Width="Auto" BorderBrush="Black" Background="Black" ItemsSource="{Binding}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock FontSize="16" Background="Black" Foreground="Green" Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
         <StackPanel MaxWidth="800" Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
-            <Grid Margin="30">
+            <Grid Margin="0,30">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="Start" IsEnabled="{Binding ServerWrapper.Stopped}" BorderBrush="White" BorderThickness="3" Foreground="White" Background="Black" Margin="5" Grid.Column="0" Content="Start Server!" FontSize="24" Click="Start_Click"/>
-                <Button x:Name="Stop" BorderBrush="White" BorderThickness="3" Foreground="White" Background="Black" Margin="5" Grid.Column="1" Content="Stop Server!" FontSize="24" Click="Stop_Click"/>
-                <Button x:Name="CreateBackup" BorderBrush="White" BorderThickness="3" Foreground="White" Background="Black" Margin="5" Grid.Column="2" Content="Create Backup!" FontSize="24" Click="CreateBackup_Click"/>
-                <TextBlock x:Name="LastBackup" Margin="5" Grid.Column="3" FontSize="24"  Foreground="White" TextWrapping="Wrap"/>
+                <Button x:Name="Start" IsEnabled="{Binding ServerWrapper.Stopped}" BorderBrush="White" BorderThickness="3" Foreground="White" Background="Black" Margin="5" Grid.Column="0" Content="Start Server!" FontSize="20" Click="Start_Click"/>
+                <Button x:Name="Stop" BorderBrush="White" BorderThickness="3" Foreground="White" Background="Black" Margin="5" Grid.Column="1" Content="Stop Server!" FontSize="20" Click="Stop_Click"/>
+                <Button x:Name="CreateBackup" BorderBrush="White" BorderThickness="3" Foreground="White" Background="Black" Margin="5" Grid.Column="2" Content="Create Backup!" FontSize="20" Click="CreateBackup_Click"/>
+                <TextBlock x:Name="NextBackupIn" Margin="5" Grid.Column="3" FontSize="18"  Foreground="White" TextWrapping="Wrap"/>
+                <TextBlock x:Name="LastBackup" Margin="5" Grid.Column="4" FontSize="18"  Foreground="White" TextWrapping="Wrap"/>
             </Grid>
-            <ScrollViewer Name="ConsoleScroll" MaxHeight="200" >
-                <TextBlock Foreground="Green" Name="ConsoleTextBlock" TextWrapping="Wrap" />
-            </ScrollViewer>
+            <ListView x:Name="Console" Background="Transparent" ItemsSource="{Binding}" MaxWidth="750" Height="200">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Background="Transparent" Foreground="Green" Text="{Binding Data}" Width="700" TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="5*"/>
