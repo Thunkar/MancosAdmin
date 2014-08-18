@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,65 @@ using System.Threading.Tasks;
 
 namespace MancosAdmin.Model
 {
-    class BackupManager 
+    class BackupManager : INotifyPropertyChanged
     {
         public List<string> BackupList;
         public string BackupPath = MainWindow.ServerPath + "\\ServerBackups";
         public string WorldPath = MainWindow.ServerPath + "\\world";
+        private int hoursToNextBackup;
+        private int minutesToNextBackup;
+        private string lastBackup;
+        private TimeSpan nextBackupIn;
+
+        public int HoursToNextBackup
+        {
+            get
+            {
+                return hoursToNextBackup;
+            }
+            set
+            {
+                hoursToNextBackup = value;
+                NotifyPropertyChanged("HoursToNextBackup");
+            }
+        }
+        public int MinutesToNextBackup
+        {
+            get
+            {
+                return minutesToNextBackup;
+            }
+            set
+            {
+                minutesToNextBackup = value;
+                NotifyPropertyChanged("HoursToNextBackup");
+            }
+        }
+        public string LastBackup
+        {
+            get
+            {
+                return lastBackup;
+            }
+            set
+            {
+                lastBackup = value;
+                NotifyPropertyChanged("LastBackup");
+            }
+        }
+        public TimeSpan NextBackupIn
+        {
+            get
+            {
+                return nextBackupIn;
+            }
+            set
+            {
+                nextBackupIn = value;
+                NotifyPropertyChanged("NextBackupIn");
+            }
+        }
+    
 
         public BackupManager()
         {
@@ -101,6 +156,12 @@ namespace MancosAdmin.Model
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string property)
+        {
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(property));
+        }
 
 
     }

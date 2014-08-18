@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Threading;
 
 namespace MancosAdmin.Model
@@ -67,7 +68,7 @@ namespace MancosAdmin.Model
         }
         public ObservableSet<Player> Players;
         public ObservableCollection<ConsoleInput> consoleData;
-        public DispatcherTimer ramtimer;
+        public Timer ramtimer;
 
 
         public ServerWrapper()
@@ -75,10 +76,15 @@ namespace MancosAdmin.Model
             Players = new ObservableSet<Player>();
             consoleData = new ObservableCollection<ConsoleInput>();
             TimeSpan ramspan = new TimeSpan(0, 0, 0, 1);
-            ramtimer = new DispatcherTimer();
-            ramtimer.Interval = ramspan;
-            ramtimer.Tick += ramtimer_Tick;
+            ramtimer = new Timer();
+            ramtimer.Interval = ramspan.TotalMilliseconds;
+            ramtimer.Elapsed += ramtimer_Elapsed;
             Stopped = true;
+        }
+
+        void ramtimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            RAM = ((Process.GetProcessesByName("java")[0].WorkingSet64 / 1024) / 1024).ToString() + " MB";
         }
 
         public void serverInitialize()
@@ -87,23 +93,20 @@ namespace MancosAdmin.Model
             string starter = "-Xms" + MinRAM + " -Xmx" + MaxRAM + " -jar " + MainWindow.ServerFile + " nogui -d64";
             var startInfo = new ProcessStartInfo(MainWindow.JavaPath + "\\" + MainWindow.JavaFile, starter);
             startInfo.WorkingDirectory = MainWindow.ServerPath;
-            startInfo.RedirectStandardInput = startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardInput = true;
+            startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
             ServerProc.StartInfo = startInfo;
             ServerProc.EnableRaisingEvents = true;
         }
 
-        void ramtimer_Tick(object sender, EventArgs e)
-        {
-            RAM = ((Process.GetProcessesByName("java")[0].WorkingSet64 / 1024) / 1024).ToString() + " MB";
-        }
 
         public void startServer()
         {
             ServerProc.Start();
             Stopped = false;
-            ServerProc.BeginErrorReadLine();
+            ServerProc.BeginOutputReadLine();
             ramtimer.Start();
         }
 
@@ -111,10 +114,10 @@ namespace MancosAdmin.Model
         {
             try
             {
+                ramtimer.Stop();
                 ServerProc.StandardInput.WriteLine("stop");
                 ServerProc.WaitForExit(10000);
-                ServerProc.CancelErrorRead();
-                ramtimer.Stop();
+                ServerProc.CancelOutputRead();
                 RAM = "";
                 Players.Clear();
                 Stopped = true;
@@ -127,18 +130,18 @@ namespace MancosAdmin.Model
 
         public void ParseServerInput(string input)
         {
-            if (input != null && input.Contains("User") && input.Contains("connecting"))
+            if (input != null && input.Contains("joined the game"))
             {
-                int nameEnd = input.IndexOf(" connecting");
+                int nameEnd = input.IndexOf(" joined");
                 string name = input.Remove(nameEnd);
-                int nameStart = input.IndexOf("User ");
+                int nameStart = input.IndexOf(": ");
                 name = name.Substring(nameStart);
-                name = name.Replace("User ", "");
+                name = name.Replace(": ", "");
                 name = name.Trim();
                 Player tobeadded = new Player(name);
                 Players.Add(tobeadded);
             }
-            if (input != null && input.Contains("lost connection"))
+            if (input != null && input.Contains("left the game"))
             {
                 try
                 {
