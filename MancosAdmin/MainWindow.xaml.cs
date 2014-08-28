@@ -58,6 +58,19 @@ namespace MancosAdmin
             Console.ItemsSource = MainViewModel.Current.ServerWrapper.consoleData;
             GUINextBackup = new DispatcherTimer();
             GUINextBackup.Tick += GUINextBackup_Tick;
+            KeyDown += MainWindow_KeyDown;
+        }
+
+        void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (Input.Text != null)
+                {
+                    MainViewModel.Current.ServerWrapper.ServerProc.StandardInput.WriteLine(Input.Text);
+                    Input.Text = "";
+                }
+            }
         }
 
         void GUINextBackup_Tick(object sender, EventArgs e)
@@ -85,7 +98,27 @@ namespace MancosAdmin
         {
             GUINextBackup.Interval = new TimeSpan(0, 0, 1);
             MainViewModel.Current.LaunchServer();
-            MainViewModel.Current.ServerWrapper.ServerProc.OutputDataReceived += ServerProc_OutputDataReceived;
+            if(MainViewModel.Current.ServerWrapper.OldVersion)
+            {
+                MainViewModel.Current.ServerWrapper.ServerProc.ErrorDataReceived += ServerProc_ErrorDataReceived;
+            }
+            else
+            {
+                MainViewModel.Current.ServerWrapper.ServerProc.OutputDataReceived += ServerProc_OutputDataReceived;
+            }
+        }
+
+        void ServerProc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            // You have to do this through the Dispatcher because this method is called by a different Thread
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ConsoleInput newData = new ConsoleInput(e.Data);
+                MainViewModel.Current.ServerWrapper.consoleData.Add(newData);
+                Console.ScrollIntoView(newData);
+                if (MainViewModel.Current.ServerWrapper.consoleData.Count > 500) MainViewModel.Current.ServerWrapper.consoleData.RemoveAt(0);
+                MainViewModel.Current.ServerWrapper.ParseServerInput(e.Data);
+            }));
         }
 
         void ServerProc_OutputDataReceived(object sender, DataReceivedEventArgs e)

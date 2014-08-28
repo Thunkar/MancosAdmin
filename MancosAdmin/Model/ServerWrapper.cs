@@ -66,6 +66,19 @@ namespace MancosAdmin.Model
                 NotifyPropertyChanged("Running");
             }
         }
+        private bool oldVersion;
+        public bool OldVersion
+        {
+            get
+            {
+                return oldVersion;
+            }
+            set
+            {
+                oldVersion = value;
+                NotifyPropertyChanged("OldVersion");
+            }
+        }
         public ObservableSet<Player> Players;
         public ObservableCollection<ConsoleInput> consoleData;
         public Timer ramtimer;
@@ -84,7 +97,14 @@ namespace MancosAdmin.Model
 
         void ramtimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            RAM = ((Process.GetProcessesByName("java")[0].WorkingSet64 / 1024) / 1024).ToString() + " MB";
+            try
+            {
+                RAM = ((Process.GetProcessById(ServerProc.Id).WorkingSet64 / 1024) / 1024).ToString() + " MB";
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+            }
         }
 
         public void serverInitialize()
@@ -93,8 +113,14 @@ namespace MancosAdmin.Model
             string starter = "-Xms" + MinRAM + " -Xmx" + MaxRAM + " -jar " + MainWindow.ServerFile + " nogui -d64";
             var startInfo = new ProcessStartInfo(MainWindow.JavaPath + "\\" + MainWindow.JavaFile, starter);
             startInfo.WorkingDirectory = MainWindow.ServerPath;
-            startInfo.RedirectStandardInput = true;
-            startInfo.RedirectStandardOutput = true;
+            if(OldVersion)
+            {
+                startInfo.RedirectStandardInput = startInfo.RedirectStandardError = true;
+            }
+            else
+            {
+                startInfo.RedirectStandardInput = startInfo.RedirectStandardOutput = true;
+            }
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
             ServerProc.StartInfo = startInfo;
@@ -106,7 +132,14 @@ namespace MancosAdmin.Model
         {
             ServerProc.Start();
             Stopped = false;
-            ServerProc.BeginOutputReadLine();
+            if(OldVersion)
+            {
+                ServerProc.BeginErrorReadLine();
+            }
+            else
+            {
+                ServerProc.BeginOutputReadLine();
+            }
             ramtimer.Start();
         }
 
@@ -116,8 +149,15 @@ namespace MancosAdmin.Model
             {
                 ramtimer.Stop();
                 ServerProc.StandardInput.WriteLine("stop");
-                ServerProc.WaitForExit(10000);
-                ServerProc.CancelOutputRead();
+                ServerProc.WaitForExit(30000);
+                if(OldVersion)
+                {
+                    ServerProc.CancelErrorRead();
+                }
+                else
+                {
+                    ServerProc.CancelOutputRead();
+                }
                 RAM = "";
                 Players.Clear();
                 Stopped = true;
