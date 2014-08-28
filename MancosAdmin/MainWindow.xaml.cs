@@ -96,15 +96,18 @@ namespace MancosAdmin
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
-            GUINextBackup.Interval = new TimeSpan(0, 0, 1);
-            MainViewModel.Current.LaunchServer();
-            if(MainViewModel.Current.ServerWrapper.OldVersion)
+            if(MainViewModel.Current.ServerWrapper.Stopped)
             {
-                MainViewModel.Current.ServerWrapper.ServerProc.ErrorDataReceived += ServerProc_ErrorDataReceived;
-            }
-            else
-            {
-                MainViewModel.Current.ServerWrapper.ServerProc.OutputDataReceived += ServerProc_OutputDataReceived;
+                GUINextBackup.Interval = new TimeSpan(0, 0, 1);
+                MainViewModel.Current.LaunchServer();
+                if (MainViewModel.Current.ServerWrapper.OldVersion)
+                {
+                    MainViewModel.Current.ServerWrapper.ServerProc.ErrorDataReceived += ServerProc_ErrorDataReceived;
+                }
+                else
+                {
+                    MainViewModel.Current.ServerWrapper.ServerProc.OutputDataReceived += ServerProc_OutputDataReceived;
+                }
             }
         }
 
@@ -136,13 +139,17 @@ namespace MancosAdmin
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            MainViewModel.Current.StopServer();
-            GUINextBackup.Stop();
+            if(!MainViewModel.Current.ServerWrapper.Stopped)
+            {
+                MainViewModel.Current.StopServer();
+                GUINextBackup.Stop();
+            }
         }
 
         private void CreateBackup_Click(object sender, RoutedEventArgs e)
         {
-            MainViewModel.Current.BackupManager.createBackup();
+            if(MainViewModel.Current.ServerWrapper.Stopped)
+                MainViewModel.Current.BackupManager.createBackup();
         }
 
         private void Submit_Click(object sender, RoutedEventArgs e)

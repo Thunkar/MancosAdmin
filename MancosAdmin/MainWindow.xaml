@@ -21,11 +21,14 @@
         <Image Grid.Column="0" Grid.Row="0" Stretch="Uniform" Height="300" Width="Auto" HorizontalAlignment="Right" Source="pack://application:,,,/Assets/MancosAdmin.png"/>
         <Image  Stretch="Uniform" Height="700" Grid.RowSpan="2" VerticalAlignment="Bottom"  Width="Auto" HorizontalAlignment="Right" Source="pack://application:,,,/Assets/peneverde.png"/>
         <StackPanel Grid.Column="1" Grid.Row="1"  Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <CheckBox Margin="0,20" Content="Pre 1.7?" FontSize="12" Foreground="White" IsChecked="{Binding ServerWrapper.OldVersion, Mode=TwoWay}">
-                <CheckBox.LayoutTransform>
-                    <ScaleTransform ScaleX="2" ScaleY="2" />
-                </CheckBox.LayoutTransform>
-            </CheckBox>
+            <StackPanel Margin="0,20" Orientation="Horizontal">
+                <CheckBox Margin="0,0,10,0" IsChecked="{Binding ServerWrapper.OldVersion, Mode=TwoWay}">
+                    <CheckBox.LayoutTransform>
+                        <ScaleTransform ScaleX="2" ScaleY="2" />
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
+                <TextBlock Text="Pre 1.7?" Foreground="White" FontSize="24"/>
+            </StackPanel>
             <TextBlock Text="Backup every:" FontSize="28" Foreground="White"/>
             <Grid Margin="0,20">
                 <Grid.ColumnDefinitions>
