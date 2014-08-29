@@ -168,15 +168,26 @@ namespace MancosAdmin.Model
             }
         }
 
+
+
         public void ParseServerInput(string input)
         {
             if (input != null && input.Contains("joined the game"))
             {
                 int nameEnd = input.IndexOf(" joined");
                 string name = input.Remove(nameEnd);
-                int nameStart = input.IndexOf(": ");
+                int nameStart = 0;
+                if(OldVersion)
+                {
+                    nameStart = input.IndexOf("Server] ");
+                }
+                else
+                {
+                    nameStart = input.IndexOf(": ");
+                }
                 name = name.Substring(nameStart);
                 name = name.Replace(": ", "");
+                name = name.Replace("Server] ", "");
                 name = name.Trim();
                 Player tobeadded = new Player(name);
                 Players.Add(tobeadded);
